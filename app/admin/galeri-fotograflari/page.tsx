@@ -1,7 +1,5 @@
 import GalleryAddForm from "./GalleryAddForm";
-<td style={{ padding: "12px", borderBottom: "1px solid #302039" }}>
-  DÜZENLE TEST
-</td>
+
 import GalleryActions from "./GalleryActions";
 import { requireAdmin } from "../../lib/auth";
 import { neon } from "@neondatabase/serverless";
