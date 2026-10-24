@@ -62,3 +62,68 @@ body { min-height: 100vh; margin: 0; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; cursor: pointer; }
 ::selection { background: #ff4fd8; color: #080612; }
+
+
+/* Portföy temasına uygun iletişim formu */
+.contact-form {
+        width: min(100% - 32px, 600px);
+        margin: 32px auto 0;
+        display: grid;
+        gap: 16px;
+      }
+      
+      .contact-form input:not([type="checkbox"]),
+      .contact-form textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 16px 18px;
+        color: #fff0fc;
+        background: rgba(19, 10, 27, 0.78);
+        border: 1px solid #493052;
+        border-radius: 12px;
+        font: inherit;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      
+      .contact-form input::placeholder,
+      .contact-form textarea::placeholder {
+        color: #a99ab5;
+      }
+      
+      .contact-form input:focus,
+      .contact-form textarea:focus {
+        border-color: #ed62e8;
+        box-shadow: 0 0 0 3px rgba(237, 98, 232, 0.12);
+      }
+      
+      .contact-form textarea {
+        resize: vertical;
+        min-height: 140px;
+      }
+      
+      .contact-form-consent {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        color: #c9b8d2;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      
+      .contact-form-consent input {
+        margin-top: 4px;
+        accent-color: #ed62e8;
+        flex-shrink: 0;
+      }
+      
+      .contact-form-submit {
+        width: 100%;
+        justify-content: center;
+        cursor: pointer;
+      }
+      
+      .contact-form-submit:hover {
+        transform: translateY(-2px);
+      }
+      

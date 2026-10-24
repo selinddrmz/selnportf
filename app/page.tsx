@@ -1,7 +1,17 @@
-
 "use client";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Script from "next/script";
+import { FormEvent } from "react";
+type GalleryPhoto = {
+  id: number;
+  baslik: string;
+  gorsel_url: string;
+  cekim_tarihi: string | null;
+  konum: string | null;
+  begeni: number;
+  kendi_cekimim: boolean;
+  kategori_id: number;
+};
 
 const EMAIL = "selindurmaz905@gmail.com";
 const GITHUB = "https://github.com/selinddrmz";
@@ -160,7 +170,7 @@ const content = {
 };
 
 const skills = [
-  { name: "Python", category: "Programming", level: 75 },
+  { name: "Python", category: "Programming", level:75 },
   { name: "SQL", category: "Data querying", level: 65 },
   { name: "Pandas & NumPy", category: "Data processing", level: 75 },
   { name: "Matplotlib & Seaborn", category: "Visualization", level: 70 },
@@ -172,6 +182,36 @@ export default function Home() {
   const [language, setLanguage] = useState<"tr" | "en">("tr");
   const [copied, setCopied] = useState(false);
   const t = content[language];
+
+  const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
+  const [galleryLoading, setGalleryLoading] = useState(true);
+  const [galleryError, setGalleryError] = useState(false);
+  
+  useEffect(() => {
+    let active = true;
+  
+    fetch("/api/gallery")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Galeri yüklenemedi");
+        }
+        return response.json();
+      })
+      .then((data: GalleryPhoto[]) => {
+        if (active) setPhotos(data);
+      })
+      .catch(() => {
+        if (active) setGalleryError(true);
+      })
+      .finally(() => {
+        if (active) setGalleryLoading(false);
+      });
+  
+    return () => {
+      active = false;
+    };
+  }, []);
+
 
   async function copyEmail() {
     try {
@@ -323,6 +363,75 @@ export default function Home() {
         <p className="note">{t.projectNote}</p>
       </section>
 
+
+      <section className="section bordered" id="gallery">
+  <div className="section-label">
+    {language === "tr" ? "04 / FOTOĞRAF GALERİSİ" : "04 / PHOTO GALLERY"}
+  </div>
+
+  <div className="section-heading">
+    <h2>
+      {language === "tr" ? "Kadrajımdan" : "Through my"}{" "}
+      <span>{language === "tr" ? "anlar." : "lens."}</span>
+    </h2>
+    <p>
+      {language === "tr"
+        ? "Fotoğraf arşivimden doğa, şehir ve etkinlik kareleri."
+        : "Nature, city, and event photos from my archive."}
+    </p>
+  </div>
+
+  {galleryLoading ? (
+    <p>{language === "tr" ? "Fotoğraflar yükleniyor..." : "Loading photos..."}</p>
+  ) : galleryError ? (
+    <p>{language === "tr" ? "Galeri şu anda yüklenemedi." : "Gallery could not be loaded."}</p>
+  ) : photos.length === 0 ? (
+    <p>{language === "tr" ? "Henüz fotoğraf bulunmuyor." : "No photos yet."}</p>
+  ) : (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 250px), 1fr))",
+        gap: "20px",
+      }}
+    >
+      {photos.map((photo) => (
+        <article
+          key={photo.id}
+          style={{
+            overflow: "hidden",
+            border: "1px solid #493052",
+            borderRadius: "16px",
+            background: "#1b1024",
+          }}
+        >
+          <img
+            src={photo.gorsel_url}
+            alt={photo.baslik}
+            loading="lazy"
+            style={{
+              display: "block",
+              width: "100%",
+              height: "230px",
+              objectFit: "cover",
+            }}
+          />
+
+          <div style={{ padding: "16px" }}>
+            <h3 style={{ margin: "0 0 8px" }}>{photo.baslik}</h3>
+            <p style={{ margin: 0, color: "#c5b2cf", fontSize: "14px" }}>
+              {photo.konum ?? ""}
+            </p>
+          </div>
+        </article>
+      ))}
+    </div>
+  )}
+</section>
+
+
+
+
       <section className="section bordered" id="education">
         <div className="section-label">{t.educationLabel}</div>
         <div className="section-heading"><h2>{t.educationTitle} <span>{t.educationAccent}</span></h2><p>{t.educationText}</p></div>
@@ -348,6 +457,68 @@ export default function Home() {
             <a href={LINKEDIN} target="_blank" rel="noreferrer"><span className="social-icon">in</span><span><small>{t.linkedinLabel}</small><strong>LinkedIn</strong></span><span className="social-arrow">↗</span></a>
             <a href={GMAIL_URL} target="_blank" rel="noreferrer"><span className="social-icon">@</span><span><small>{t.emailLabel}</small><strong>{EMAIL}</strong></span><span className="social-arrow">↗</span></a>
           </div>
+          
+ 
+
+ <form
+ action="/api/contact"
+ method="post"
+ className="contact-form"
+>
+ <input
+   name="ad_soyad"
+   placeholder="Adınız ve soyadınız"
+   aria-label="Adınız ve soyadınız"
+   required
+ />
+
+ <input
+   name="eposta"
+   type="email"
+   placeholder="E-posta adresiniz"
+   aria-label="E-posta adresiniz"
+   required
+ />
+
+ <textarea
+   name="mesaj"
+   placeholder="Mesajınızı buraya yazın..."
+   aria-label="Mesajınız"
+   rows={5}
+   required
+ />
+
+<Script
+  src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+  strategy="afterInteractive"
+/>
+
+<div
+  className="cf-turnstile"
+  data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+  data-theme="dark"
+/> 
+<label className="contact-form-consent">
+  <input type="checkbox" name="kvkk_onay" required />
+  <span>
+    <a
+      href="/kvkk-aydinlatma"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      KVKK Aydınlatma Metni
+    </a>
+    ’ni okudum.
+  </span>
+</label>
+
+
+ <button type="submit" className="button primary contact-form-submit">
+   Mesajı gönder <span aria-hidden="true">↗</span>
+ </button>
+</form>
+
+
         </div>
       </section>
 
